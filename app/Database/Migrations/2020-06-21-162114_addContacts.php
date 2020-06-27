@@ -55,7 +55,8 @@ class AddContacts extends Migration
 			'banned_reason' => [
 				'type'				=> 'VARCHAR',
 				'constraint'		=> 250,
-				'default'			=> 1,
+				'default'			=> null,
+				'null'				=> true,
 			],
 			'created_datetime' => [
 				'type'				=> 'DATETIME',
@@ -66,6 +67,14 @@ class AddContacts extends Migration
 				'null'				=> true,
 			],
 			'unfollow_datetime' => [
+				'type'				=> 'DATETIME',
+				'null'				=> true,
+			],
+			'updated_datetime' => [
+				'type'				=> 'DATETIME',
+				'null'				=> true,
+			],
+			'deleted_datetime' => [
 				'type'				=> 'DATETIME',
 				'null'				=> true,
 			]

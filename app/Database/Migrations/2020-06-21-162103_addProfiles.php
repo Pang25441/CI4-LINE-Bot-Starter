@@ -40,6 +40,10 @@ class AddProfiles extends Migration
 			'updated_datetime' => [
 				'type'				=> 'DATETIME',
 				'null'				=> true
+			],
+			'deleted_datetime' => [
+				'type'				=> 'DATETIME',
+				'null'				=> true
 			]
 		])
 		->addPrimaryKey('id')

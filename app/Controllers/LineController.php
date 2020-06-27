@@ -3,11 +3,8 @@
 namespace App\Controllers;
 
 use CodeIgniter\Controller;
-use CodeIgniter\Exceptions\PageNotFoundException;
 
 use App\Libraries\Linebot;
-
-use Exception;
 
 class LineController extends Controller {
     
@@ -47,11 +44,27 @@ class LineController extends Controller {
 				$this->sourceType = $this->event->source->type;
 
 				$this->replyToken = $this->event->replyToken;
+
+				$this->checkContact($this->event->source->userId);
 			}
 		}
 
 		$this->linebot = new Linebot($this->event);
 	}
 
+	private function checkContact($userId=null) {
+		$contactModel = new \App\Models\ContactModel();
+		$contact = $contactModel->where('userId',$userId)->findAll(1);
+
+		if(!$contact) {
+			// utf8_encode 
+			$data = [
+				'userId' => $userId,
+				'uniqueId' => uniqid()
+			];
+			
+			$contactModel->insert($data);
+		}
+	}
 	
 }
