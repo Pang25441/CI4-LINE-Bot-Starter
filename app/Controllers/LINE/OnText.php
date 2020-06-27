@@ -9,6 +9,6 @@ class OnText extends LineController
 
     public function index()
     {
-        $this->replyTextMessage($this->replyToken, lang('Line.Welcome'));
+        $this->linebot->replyText($this->replyToken, lang('Line.Welcome'));
     }
 }
