@@ -30,6 +30,27 @@ class Linebot
         
     }
 
+    public function getProfile($userId) 
+    {
+        $response = $this->bot->getProfile($userId);
+
+        $profile = $response->getJSONDecodedBody();
+        // echo $profile['displayName'];
+        // echo $profile['pictureUrl'];
+        // echo $profile['statusMessage'];
+
+        if ($response->isSucceeded()) 
+        {
+            return $profile;
+        }
+        else
+        {
+            log_message('info', var_export($profile, true));
+            return false;
+        }
+
+    }
+
     public function pushMessage(array $message) 
     {
 
@@ -109,14 +130,15 @@ class Linebot
 		 * 4xx = Do not retry
 		 * 500 = LINE Bot error Use request id for retry later
 		 */
-		if($httpStatusCode == 200) {
+
+		if($response->isSucceeded()) {
 			return true;
 		}
 
 		$requestId = $response->getHeader('X-Line-Request-Id');
 		$body = $response->getJSONDecodedBody();
 
-		$error_msg = "$origin_method (ReqId: $requestId) Failed";
+		$error_msg = "$origin_method (ReqId: $requestId) Failed ($httpStatusCode)";
 		log_message('error',$error_msg);
 		log_message('info', var_export($body, true));
 

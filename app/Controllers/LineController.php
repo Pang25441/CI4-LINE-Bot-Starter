@@ -29,15 +29,18 @@ class LineController extends Controller {
         $this->receivePayload();
 	}
 
-    private function receivePayload() {
+	private function receivePayload() 
+	{
 		$this->line = new \Config\Line();
 
 		$payload = file_get_contents('php://input');
-		if($payload) {
+		if($payload) 
+		{
 			log_message('info',$payload);
 			$decoded_payload = json_decode($payload);
 
-			if(is_array($decoded_payload->events)){
+			if(is_array($decoded_payload->events))
+			{
 				$this->event = $decoded_payload->events[0];
 
 				$this->source = $this->event->source;
@@ -45,26 +48,46 @@ class LineController extends Controller {
 
 				$this->replyToken = $this->event->replyToken;
 
-				$this->checkContact($this->event->source->userId);
 			}
 		}
 
 		$this->linebot = new Linebot($this->event);
+
+		if($this->event)
+		{
+			$this->checkContact($this->event->source->userId);
+		}
 	}
 
-	private function checkContact($userId=null) {
+	private function checkContact($userId=null) 
+	{
 		$contactModel = new \App\Models\ContactModel();
-		$contact = $contactModel->where('userId',$userId)->findAll(1);
 
-		if(!$contact) {
+		$contact = $contactModel->where('userId', $userId)->first();
+		
+		if(!$contact) 
+		{
 			// utf8_encode 
+			$profile = $this->linebot->getProfile($userId);
 			$data = [
 				'userId' => $userId,
-				'uniqueId' => uniqid()
+				'uniqueId' => uniqid(),
+				'follow_datetime' => date('Y-m-d H:i:s')
 			];
+
+			if($profile)
+			{
+				$data['displayName'] = $profile['displayName'];
+				$data['language'] = $profile['language'];
+			}
 			
 			$contactModel->insert($data);
 		}
+		else
+		{
+			// Update Profile Daily
+		}
+		
 	}
 	
 }

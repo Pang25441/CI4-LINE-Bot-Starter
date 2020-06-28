@@ -15,10 +15,10 @@ class AddContacts extends Migration
 			],
 			'userId' => [
 				'type'				=> 'VARCHAR',
-				'constraint'		=> 32,
+				'constraint'		=> 50,
 				'unique'			=> true,
 			],
-			'display_name' => [
+			'displayName' => [
 				'type'				=> 'VARCHAR',
 				'constraint'		=> 100,
 				'null'				=> true

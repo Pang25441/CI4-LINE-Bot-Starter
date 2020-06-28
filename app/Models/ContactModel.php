@@ -12,7 +12,7 @@ class ContactModel extends Model
 
     protected $allowedFields = [
                                     'userId', 
-                                    'display_name', 
+                                    'displayName', 
                                     'language', 
                                     'profile_id', 
                                     'uniqueId', 
