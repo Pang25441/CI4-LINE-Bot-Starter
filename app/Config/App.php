@@ -88,7 +88,7 @@ class App extends BaseConfig
 	| found, the first locale will be used.
 	|
 	*/
-	public $supportedLocales = ['en'];
+	public $supportedLocales = ['en','th'];
 
 	/*
 	|--------------------------------------------------------------------------
@@ -99,7 +99,7 @@ class App extends BaseConfig
 	| dates with the date helper, and can be retrieved through app_timezone()
 	|
 	*/
-	public $appTimezone = 'America/Chicago';
+	public $appTimezone = 'Asia/Bangkok';
 
 	/*
 	|--------------------------------------------------------------------------

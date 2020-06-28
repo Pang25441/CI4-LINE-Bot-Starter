@@ -1,6 +1,7 @@
 <?php 
 
 return [
-    'Welcome' => "สวัสดี",
-    'Welcomeback' => "สวัสดีอีกครั้ง"
+    'Greeting' => "ยินดีต้อนรับ นี่คือ Line Bot Backend Starter",
+    'GreetingAgain' => "ยินดีต้อนรับ อีกครั้ง",
+    'ThanksForSendMsg' => "ขอบคุณที่ส่งข้อความถึงเรา"
 ];

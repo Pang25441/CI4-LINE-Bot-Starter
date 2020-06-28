@@ -14,6 +14,7 @@ class LineController extends Controller {
 	protected $source = null;
 	protected $source_type = null;
 	protected $replyToken = null;
+	protected $userId = null;
 
 	protected $trigger = '';
 	
@@ -44,7 +45,9 @@ class LineController extends Controller {
 				$this->event = $decoded_payload->events[0];
 
 				$this->source = $this->event->source;
-				$this->sourceType = $this->event->source->type;
+				$this->sourceType = $this->source->type;
+
+				$this->userId = $this->source->userId;
 
 				$this->replyToken = $this->event->replyToken;
 
@@ -55,11 +58,11 @@ class LineController extends Controller {
 
 		if($this->event)
 		{
-			$this->checkContact($this->event->source->userId);
+			$this->checkContact($this->source->userId);
 		}
 	}
 
-	private function checkContact($userId=null) 
+	protected function checkContact($userId=null) 
 	{
 		$contactModel = new \App\Models\ContactModel();
 
@@ -77,17 +80,22 @@ class LineController extends Controller {
 
 			if($profile)
 			{
-				$data['displayName'] = $profile['displayName'];
+				$data['displayName'] = utf8_encode($profile['displayName']);
 				$data['language'] = $profile['language'];
 			}
 			
-			$contactModel->insert($data);
+			$contact_id = $contactModel->insert($data);
+			$contact = $contactModel->find($contact_id);
+			$contact_type = 'NEW_CONTACT';
 		}
 		else
 		{
 			// Update Profile Daily
+			$contact_type = 'OLD_CONTACT';
 		}
-		
+
+		$this->request->setLocale($contact['language']);
+		return $contact_type;
 	}
 	
 }
