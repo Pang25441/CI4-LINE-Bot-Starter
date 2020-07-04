@@ -70,7 +70,8 @@ class LineController extends Controller {
 		
 		if(!$contact) 
 		{
-			// utf8_encode 
+			// Don't have contact yet
+
 			$profile = $this->linebot->getProfile($userId);
 			$data = [
 				'userId' => $userId,
@@ -94,6 +95,7 @@ class LineController extends Controller {
 			$contact_type = 'OLD_CONTACT';
 		}
 
+		// Set Language by user 
 		$this->request->setLocale($contact['language']);
 		return $contact_type;
 	}

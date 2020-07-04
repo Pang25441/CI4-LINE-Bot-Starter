@@ -58,6 +58,12 @@ class AddContacts extends Migration
 				'default'			=> null,
 				'null'				=> true,
 			],
+			'richmenu_id' => [
+				'type'				=> 'INT',
+				'constraint'		=> 10,
+				'default'			=> null,
+				'unsigned'			=> true,
+			],
 			'created_datetime' => [
 				'type'				=> 'DATETIME',
 				'null'				=> true,
@@ -80,7 +86,8 @@ class AddContacts extends Migration
 			]
 		])
 		->addPrimaryKey('id')
-		->addForeignKey('profile_id','profiles','id','CASCADE','CASCADE')
+		->addForeignKey('profile_id','profiles','id','SET NULL','CASCADE')
+		->addForeignKey('richmenu_id','richmenu','id','SET NULL','CASCADE')
 		->createTable('contacts');
 	}
 
