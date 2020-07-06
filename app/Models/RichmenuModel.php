@@ -2,19 +2,18 @@
 
 use CodeIgniter\Model;
 
-class ProfileModel extends Model
+class RichmenuModel extends Model
 {
-    protected $table      = 'profiles';
+    protected $table      = 'richmenu';
     protected $primaryKey = 'id';
 
     protected $returnType     = 'array';
     protected $useSoftDeletes = true;
 
-    protected $allowedFields = [
-                                    'firstname', 
-                                    'lastname', 
-                                    'email', 
-                                    'password', 
+    protected $allowedFields =  [
+                                    'richMenuId',
+                                    'name',
+                                    'data',
                                     'created_datetime', 
                                     'updated_datetime',
                                     'deleted_datetime'
