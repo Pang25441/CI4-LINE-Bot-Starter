@@ -20,7 +20,7 @@ class ProfileModel extends Model
                                     'deleted_datetime'
                                 ];
 
-    protected $useTimestamps = false;
+    protected $useTimestamps = true;
     protected $createdField  = 'created_datetime';
     protected $updatedField  = 'updated_datetime';
     protected $deletedField  = 'deleted_datetime';

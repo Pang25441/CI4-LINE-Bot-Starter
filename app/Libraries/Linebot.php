@@ -144,9 +144,9 @@ class Linebot
 			CURLOPT_TIMEOUT => 30,
 			CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
 			CURLOPT_CUSTOMREQUEST => "POST",
-			CURLOPT_POSTFIELDS => json_encode($richMenuJSON),
+			CURLOPT_POSTFIELDS => $richMenuJSON,
 			CURLOPT_HTTPHEADER => array(
-				"authorization: Bearer " . $this->line->channelSecret,
+				"authorization: Bearer " . $this->line->channelAccessToken,
 				"cache-control: no-cache",
 				"content-type: application/json"
 			),

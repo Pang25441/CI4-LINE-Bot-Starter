@@ -11,7 +11,7 @@ class RichmenuModel extends Model
     protected $useSoftDeletes = true;
 
     protected $allowedFields =  [
-                                    'richmenuId',
+                                    'richMenuId',
                                     'name',
                                     'data',
                                     'created_datetime', 
@@ -19,7 +19,7 @@ class RichmenuModel extends Model
                                     'deleted_datetime'
                                 ];
 
-    protected $useTimestamps = false;
+    protected $useTimestamps = true;
     protected $createdField  = 'created_datetime';
     protected $updatedField  = 'updated_datetime';
     protected $deletedField  = 'deleted_datetime';
