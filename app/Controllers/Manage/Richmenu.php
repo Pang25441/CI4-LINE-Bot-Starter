@@ -29,6 +29,15 @@ class Richmenu extends BaseController
     {
         $richmenuModel = new \App\Models\RichmenuModel();
         $data = $richmenuModel->findAll();
+        foreach($data AS $k=>$rich) 
+        {
+            if( file_exists( ROOTPATH . 'public/richmenu/' . $rich['richMenuId'].'.jpg' ) )
+            {
+                $data[$k]['image'] = base_url('richmenu/'.$rich['richMenuId'].'.jpg');
+            } else {
+                $data[$k]['image'] = null;
+            }
+        }
         return $this->response->setJSON($data);
     }
 
@@ -38,6 +47,8 @@ class Richmenu extends BaseController
         $linebot = new Linebot();
 
         $richmenu_image = $this->request->getFile('richmenuimage');
+
+        $newName = null;
 
         if ($richmenu_image && $richmenu_image->isValid() && !$richmenu_image->hasMoved()) 
         {
@@ -55,12 +66,14 @@ class Richmenu extends BaseController
         $json = json_decode($richmenu_object);
         $richmenuModel = new \App\Models\RichmenuModel();
         $data = $richmenuModel->where('name',$json->name)->first();
-        // var_export($data);
-        // exit();
         
         if($data) {
             $session->set('save_status',false);
             $session->set('save_message','Rich Menu Name is duplicated');
+            if($newName && file_exists(WRITEPATH. 'uploads/' . $newName))
+            {
+                unlink(WRITEPATH. 'uploads/' . $newName);
+            }
             $this->response->redirect('/Manage/Richmenu');
             return;
         }
@@ -89,6 +102,10 @@ class Richmenu extends BaseController
             $session->set('save_status',false);
             $session->set('save_message','Rich Menu Create failed.');
         }
+        if($newName && file_exists(WRITEPATH. 'uploads/' . $newName))
+        {
+            unlink(WRITEPATH. 'uploads/' . $newName);
+        }
         $this->response->redirect('/Manage/Richmenu');
     }
 
@@ -105,14 +122,14 @@ class Richmenu extends BaseController
             if($result) 
             {
                 $richmenuModel->delete($id);
-                $data = [
+                $response = [
                     'save_status' => true,
                     'save_message' => 'Rich Menu Deleted.'
                 ];
             }
             else
             {
-                $data = [
+                $response = [
                     'save_status' => false,
                     'save_message' => 'Rich Menu Delete failed.'
                 ];
@@ -120,13 +137,24 @@ class Richmenu extends BaseController
         }
         else
         {
-            $data = [
+            $response = [
                 'save_status' => false,
                 'save_message' => 'Rich Menu Not found.'
             ];
         }
 
-        $this->response->setJSON($data);
+        return $this->response->setJSON($response);
+    }
+
+    public function loadImage($richMenuId) {
+        $linebot = new Linebot();
+        $response = $linebot->downloadRichmenuImage($richMenuId);
+        if($response->getHTTPStatus() == 200)
+        {
+            helper('filesystem');
+            write_file(ROOTPATH. 'public/richmenu/' . $richMenuId.'.jpg',$response->getRawBody());
+        }
+        
     }
 
     public function syncRichMenu()
@@ -152,8 +180,6 @@ class Richmenu extends BaseController
                         'data' => json_encode($rich)
                     ];
 
-                    // var_dump($data);
-
                     $richmenuModel->save($data);
                     $richMenuIds[] = $rich['richMenuId'];
                 }
@@ -165,7 +191,7 @@ class Richmenu extends BaseController
                     $deleted[] = $rich['richMenuId'];
                 }
             }
-            var_dump($deleted);
+            
             if ($deleted) {
                 $richmenuModel = new \App\Models\RichmenuModel();
                 $richmenuModel->delete($deleted);

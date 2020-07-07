@@ -175,8 +175,10 @@ class Linebot
 	function uploadRichmenuImage($richMenuId, $imagePath) 
 	{
 		$contentType = mime_content_type($imagePath);
-		if(!in_array($contentType, [IMAGETYPE_JPEG, IMAGETYPE_PNG]))
+		if(!in_array($contentType, ['image/jpeg', 'image/png']))
 		{
+			log_message('error','Rich Menu Image Type Invalid');
+			log_message('error',var_export($contentType,true));
 			return false;
 		}
 
@@ -185,8 +187,16 @@ class Linebot
 		return $this->responseHandler('uploadRichmenuImage',$response);
 
 	}
+
+	function downloadRichmenuImage($richMenuId)
+	{
+		$response = $this->bot->downloadRichMenuImage($richMenuId);
+
+		return $response;
+	}
 	
-	function deleteRichmenu($richMenuId) {
+	function deleteRichmenu($richMenuId) 
+	{
 		$response = $this->bot->deleteRichMenu($richMenuId);
 		return $this->responseHandler('deleteRichmenu',$response);
 	}

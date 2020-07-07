@@ -10,11 +10,11 @@
 
     <div class="row mb-1">
         <div class="col-auto mr-auto">
-            <button type="button" class="btn btn-sm btn-danger" onclick="reSync()">Re-Sync RichMenu</button>
+            <button type="button" class="btn btn-sm btn-outline-primary" onclick="reSync()">Re-Sync RichMenu</button>
         </div>
         <div class="col-auto">
-            <button type="button" class="btn btn-sm btn-secondary" onclick="refreshRichmenu()">Refresh</button>
-            <button type="button" class="btn btn-sm btn-success" data-toggle="modal" data-target="#richmenucreate">Create</button>
+            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="refreshRichmenu()"><i class="fas fa-redo"></i> Refresh</button>
+            <button type="button" class="btn btn-sm btn-success" data-toggle="modal" data-target="#richmenucreate"><i class="fas fa-plus"></i> Create</button>
         </div>
     </div>
 
@@ -25,22 +25,22 @@
                 <th scope="col" class="text-center">richMenuId</th>
                 <th scope="col" class="text-center">Name</th>
                 <th scope="col" class="text-center">Data</th>
-                <th scope="col" class="text-center">Image</th>
+                <th scope="col" class="text-center" width="20%">Image</th>
                 <th scope="col" class="text-center">Action</th>
             </tr>
         </thead>
         <tbody data-list-body>
             <tr data-list-proto class="d-none">
-                <th scope="row" data-index>{index}</th>
+                <th scope="row" class="text-right" data-index>{index}</th>
                 <td data-richMenuId>{richMenuId}</td>
                 <td data-name>{Name}</td>
-                <td>
-                    <a elm-databtn href="#" data-toggle="modal" data-target="" class="d-block text-center">Show Data</a>
+                <td align="center">
+                    <a elm-databtn href="#" data-toggle="modal" data-target="" class="btn btn-sm btn-outline-secondary"><i class="fas fa-code"></i><br>Show Data</a>
 
                     <div elm-databox class="modal fade" tabindex="-1" role="dialog">
                         <div class="modal-dialog modal-lg ">
                             <div class="modal-content">
-                                <div class="modal-body">
+                                <div class="modal-body text-left">
                                     <!-- <textarea data-data class="form-control" rows="20"></textarea> -->
                                     <pre><code data-data class="json">...</code></pre>
                                 </div>
@@ -60,8 +60,8 @@
                             Action
                         </button>
                         <div class="dropdown-menu dropdown-menu-right">
-                            <button class="dropdown-item" type="button" data-action-rebuild>Re-Create</button>
-                            <button class="dropdown-item" type="button" data-action-delete>Delete</button>
+                            <button class="dropdown-item" type="button" data-action-rebuild><i class="fas fa-recycle"></i> Re-Create</button>
+                            <button class="dropdown-item text-danger" type="button" data-action-delete><i class="far fa-trash-alt"></i> Delete</button>
                         </div>
                     </div>
                 </td>
@@ -106,6 +106,9 @@
 
     $(document).ready(() => {
         loadRichMenu();
+        document.querySelectorAll('.code').forEach((block) => {
+            hljs.highlightBlock(block);
+        });
     })
 
     function loadRichMenu() {
@@ -116,7 +119,7 @@
                 $('[data-list-index]').remove();
 
                 for (let i in data) {
-                    var a = $('[data-list-proto]').clone().attr('data-list-index', i).removeAttr('data-list-proto').removeClass('d-none')
+                    var a = $('[data-list-proto]').clone().attr('data-list-index', data[i].id).removeAttr('data-list-proto').removeClass('d-none')
                         .appendTo('[data-list-body]');
 
                     let index = parseInt(i) + 1;
@@ -133,6 +136,15 @@
                     $(a).find('[data-action-delete]').click(function() {
                         deleteRichMenu(data[i].id)
                     })
+
+                    if(data[i].image)
+                    {
+                        $(a).find('[data-image]').append('<a href="'+data[i].image+'" target="_blank"><img class="img-fluid" src="'+data[i].image+'"></a>');
+                    }
+                    else
+                    {
+                        $(a).find('[data-image]').append('<a href="#" onClick="loadImage(\''+data[i].richMenuId+'\')">Reload Image</a>');
+                    }
 
                 }
 
@@ -154,7 +166,7 @@
             $.get(site_url + '/Manage/Richmenu/syncRichMenu', (data, status) => {
                 $('[elm-body] .btn').prop('disabled', false)
                 if (status == 'success') {
-                    alert('Done !')
+                    // alert('Done !')
                     loadRichMenu();
                 } else {
                     alert('Sync Failed')
@@ -195,13 +207,32 @@
     function deleteRichMenu(id) {
         if(confirm('Delete?'))
         {
-            $.post(site_url + '/Manage/Richmenu/deleteRichmenu', {
-                id: id
-            }, (data, status) => {
+            $.post(site_url + '/Manage/Richmenu/deleteRichmenu', { id: id },
+            (data, status) => {
+                console.log(status)
+                console.log(data)
                 if (status == 'success') {
+                    if(data.save_status){
+                        alert(data.save_message);
+                    } else {
+                        alert(data.save_message);
+                    }
                     loadRichMenu();
                 }
             })
         }
+    }
+
+    function loadImage(richMenuId) 
+    {
+        $.get(site_url + '/Manage/Richmenu/loadImage/'+richMenuId, (data, status) => {
+                $('[elm-body] .btn').prop('disabled', false)
+                if (status == 'success') {
+                    // alert('Done !')
+                    loadRichMenu();
+                } else {
+                    alert('Loading image Failed')
+                }
+            })
     }
 </script>
