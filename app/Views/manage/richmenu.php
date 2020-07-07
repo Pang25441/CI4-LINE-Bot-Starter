@@ -2,13 +2,19 @@
 
     <h1 class="mb-3">Manage/RichMenu</h1>
 
+    <?php if ($save_status === true || $save_status === false) : ?>
+        <div class="alert <?php echo $save_status ? 'alert-success' : 'alert-danger'; ?>" role="alert">
+            <?php echo ucfirst($save_message); ?>
+        </div>
+    <?php endif; ?>
+
     <div class="row mb-1">
         <div class="col-auto mr-auto">
             <button type="button" class="btn btn-sm btn-danger" onclick="reSync()">Re-Sync RichMenu</button>
         </div>
         <div class="col-auto">
             <button type="button" class="btn btn-sm btn-secondary" onclick="refreshRichmenu()">Refresh</button>
-            <button type="button" class="btn btn-sm btn-success">Create</button>
+            <button type="button" class="btn btn-sm btn-success" data-toggle="modal" data-target="#richmenucreate">Create</button>
         </div>
     </div>
 
@@ -29,7 +35,7 @@
                 <td data-richMenuId>{richMenuId}</td>
                 <td data-name>{Name}</td>
                 <td>
-                    <a elm-databtn href="#" data-toggle="modal" data-target="">Show Data</a>
+                    <a elm-databtn href="#" data-toggle="modal" data-target="" class="d-block text-center">Show Data</a>
 
                     <div elm-databox class="modal fade" tabindex="-1" role="dialog">
                         <div class="modal-dialog modal-lg ">
@@ -65,6 +71,36 @@
 
 </div>
 
+<div class="modal fade" id="richmenucreate" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form method="post" enctype="multipart/form-data" action="<?php echo site_url('Manage/Richmenu/createRichmenu'); ?>" onsubmit="return createRichMenu()">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Create RichMenu</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="richmenuimage">Rich Menu Image</label>
+                        <input type="file" class="form-control-file" name="richmenuimage" id="richmenuimage" accept="image/png,image/jpeg">
+                    </div>
+                    <hr>
+                    <div class="form-group">
+                        <label for="richmenudata">Rich Menu Object (JSON)</label>
+                        <textarea class="form-control" name="richmenudata" id="richmenudata" cols="30" rows="20"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Create</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <script>
     var site_url = '<?php echo site_url(); ?>'
 
@@ -74,13 +110,13 @@
 
     function loadRichMenu() {
         $('[elm-body] .btn').prop('disabled', true)
-        $.get(site_url + '/Manage/loadRichmenu', (data, status) => {
+        $.get(site_url + '/Manage/Richmenu/loadRichmenu', (data, status) => {
             $('[elm-body] .btn').prop('disabled', false)
             if (status == 'success') {
                 $('[data-list-index]').remove();
 
                 for (let i in data) {
-                    var a = $('[data-list-proto]').clone().attr('data-list-index', i).removeClass('d-none')
+                    var a = $('[data-list-proto]').clone().attr('data-list-index', i).removeAttr('data-list-proto').removeClass('d-none')
                         .appendTo('[data-list-body]');
 
                     let index = parseInt(i) + 1;
@@ -115,14 +151,12 @@
     function reSync() {
         if (confirm('Sync Richmenu list from LINE OA')) {
             $('[elm-body] .btn').prop('disabled', true)
-            $.get(site_url + '/Manage/syncRichMenu', (data, status) => {
+            $.get(site_url + '/Manage/Richmenu/syncRichMenu', (data, status) => {
                 $('[elm-body] .btn').prop('disabled', false)
-                if(status == 'success'){
+                if (status == 'success') {
                     alert('Done !')
                     loadRichMenu();
-                }
-                else
-                {
+                } else {
                     alert('Sync Failed')
                 }
             })
@@ -134,7 +168,24 @@
     }
 
     function createRichMenu() {
+        if ($('#richmenuimage').get(0).files.length === 0) {
+            alert('Please Select Rich Menu Image');
+            return false;
+        }
 
+        if ($('#richmenudata').val().length === 0) {
+            alert('Rich Menu Object Invalid');
+            return false;
+        }
+
+        try {
+            var json = JSON.parse($('#richmenudata').val());
+        } catch (e) {
+            alert('Rich Menu Object Invalid');
+            return false;
+        }
+
+        return true;
     }
 
     function reBuildRichmenu(id) {
@@ -142,6 +193,15 @@
     }
 
     function deleteRichMenu(id) {
-        alert('Delete ' + id)
+        if(confirm('Delete?'))
+        {
+            $.post(site_url + '/Manage/Richmenu/deleteRichmenu', {
+                id: id
+            }, (data, status) => {
+                if (status == 'success') {
+                    loadRichMenu();
+                }
+            })
+        }
     }
 </script>

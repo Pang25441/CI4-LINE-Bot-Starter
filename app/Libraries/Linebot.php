@@ -184,7 +184,12 @@ class Linebot
 		
 		return $this->responseHandler('uploadRichmenuImage',$response);
 
-    }
+	}
+	
+	function deleteRichmenu($richMenuId) {
+		$response = $this->bot->deleteRichMenu($richMenuId);
+		return $this->responseHandler('deleteRichmenu',$response);
+	}
 
 	####################################################################################################################################
 	############################################                                            ############################################
