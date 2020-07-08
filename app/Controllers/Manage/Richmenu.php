@@ -154,7 +154,64 @@ class Richmenu extends BaseController
             helper('filesystem');
             write_file(ROOTPATH. 'public/richmenu/' . $richMenuId.'.jpg',$response->getRawBody());
         }
-        
+    }
+
+    public function setDefault()
+    {
+        $id = $this->request->getPost('id');
+        $richmenuModel = new \App\Models\RichmenuModel();
+        $linebot = new Linebot();
+
+        $richmenu = $richmenuModel->find($id);
+        $defaultRichMenuId = $richmenu['richMenuId'];
+        log_message('info',$defaultRichMenuId);
+
+        if($linebot->setDefaultRichMenu($richmenu['name']))
+        {
+            $richmenuModel->set(['isDefault'=>null])->update();
+            $richmenuModel->where('richMenuId',$defaultRichMenuId)->set(['isDefault'=>1])->update();
+            $response = [
+                'save_status' => true,
+                'save_message' => 'Default Rich Menu has updated.'
+            ];
+        }
+        else
+        {
+            $response = [
+                'save_status' => false,
+                'save_message' => 'Set Default Rich Menu failed.'
+            ];
+        }
+
+        return $this->response->setJSON($response);
+    }
+
+    public function unsetDefault()
+    {
+        // $id = $this->request->getPost('id');
+        $richmenuModel = new \App\Models\RichmenuModel();
+        $linebot = new Linebot();
+
+        // $richmenu = $richmenuModel->find($id);
+        // $defaultRichMenuId = $richmenu['richMenuId'];
+
+        if( $linebot->cancelDefaultRichMenu() )
+        {
+            $richmenuModel->set(['isDefault'=>null])->update();
+            $response = [
+                'save_status' => true,
+                'save_message' => 'Default Rich Menu has canceled.'
+            ];
+        }
+        else
+        {
+            $response = [
+                'save_status' => false,
+                'save_message' => 'Cancel Default Rich Menu Failed'
+            ];
+        }
+
+        return $this->response->setJSON($response);
     }
 
     public function syncRichMenu()
@@ -195,6 +252,13 @@ class Richmenu extends BaseController
             if ($deleted) {
                 $richmenuModel = new \App\Models\RichmenuModel();
                 $richmenuModel->delete($deleted);
+            }
+
+            $defaultRichMenuId = $linebot->getDefaultRichMenuId();
+            if($defaultRichMenuId)
+            {
+                $richmenuModel->set('isDefault',null)->update();
+                $richmenuModel->where('richMenuId',$defaultRichMenuId)->set('isDefault',1)->update();
             }
         }
     }

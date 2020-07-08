@@ -60,6 +60,8 @@
                             Action
                         </button>
                         <div class="dropdown-menu dropdown-menu-right">
+                            <button class="dropdown-item" type="button" data-action-default><i class="fas fa-check"></i> Set Default Menu</button>
+                            <button class="dropdown-item" type="button" data-action-remove><i class="fas fa-minus-circle"></i> Unset Default Menu</button>
                             <button class="dropdown-item" type="button" data-action-rebuild><i class="fas fa-recycle"></i> Re-Create</button>
                             <button class="dropdown-item text-danger" type="button" data-action-delete><i class="far fa-trash-alt"></i> Delete</button>
                         </div>
@@ -123,10 +125,11 @@
                         .appendTo('[data-list-body]');
 
                     let index = parseInt(i) + 1;
+                    let isDefault = data[i].isDefault==1 ? ' (Default)' : '';
                     $(a).find('[data-index]').attr('data-index', data[i].id)
                     $(a).find('[data-index]').text(index);
                     $(a).find('[data-richMenuId]').text(data[i].richMenuId);
-                    $(a).find('[data-name]').text(data[i].name);
+                    $(a).find('[data-name]').text(data[i].name+isDefault);
                     $(a).find('[data-data]').text(JSON.stringify(JSON.parse(data[i].data), null, '    '));
                     $(a).find('[elm-databtn]').attr('data-target', '[elm-databox="' + data[i].id + '"]')
                     $(a).find('[elm-databox]').attr('elm-databox', data[i].id)
@@ -144,6 +147,21 @@
                     else
                     {
                         $(a).find('[data-image]').append('<a href="#" onClick="loadImage(\''+data[i].richMenuId+'\')">Reload Image</a>');
+                    }
+
+                    if(data[i].isDefault==1)
+                    {
+                        $(a).find('[data-action-default]').remove()
+                        $(a).find('[data-action-remove]').click(()=>{
+                            unsetDefault(data[i].id);
+                        })
+                    }
+                    else
+                    {
+                        $(a).find('[data-action-remove]').remove()
+                        $(a).find('[data-action-default]').click(()=>{
+                            setDefault(data[i].id);
+                        })
                     }
 
                 }
@@ -234,5 +252,45 @@
                     alert('Loading image Failed')
                 }
             })
+    }
+
+    function setDefault(id)
+    {
+        if(confirm('Set Rich Menu to Default?'))
+        {
+            $.post(site_url + '/Manage/Richmenu/setDefault', { id: id },
+            (data, status) => {
+                console.log(status)
+                console.log(data)
+                if (status == 'success') {
+                    if(data.save_status){
+                        alert(data.save_message);
+                    } else {
+                        alert(data.save_message);
+                    }
+                    loadRichMenu();
+                }
+            })
+        }
+    }
+
+    function unsetDefault(id)
+    {
+        if(confirm('Remove Default Rich Menu ?'))
+        {
+            $.post(site_url + '/Manage/Richmenu/unsetDefault', { id: id },
+            (data, status) => {
+                console.log(status)
+                console.log(data)
+                if (status == 'success') {
+                    if(data.save_status){
+                        alert(data.save_message);
+                    } else {
+                        alert(data.save_message);
+                    }
+                    loadRichMenu();
+                }
+            })
+        }
     }
 </script>
