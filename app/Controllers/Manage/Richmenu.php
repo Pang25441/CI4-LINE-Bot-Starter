@@ -19,6 +19,7 @@ class Richmenu extends BaseController
         $body = view('manage/richmenu', ['save_status' => $save_status, 'save_message' => $save_message]);
         $data = [
             'title' => 'Richmenu',
+            'header' => view('manage/header'),
             'body' => $body
         ];
 
