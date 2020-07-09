@@ -10,7 +10,7 @@
 
     <div class="row mb-1">
         <div class="col-auto mr-auto">
-            <button type="button" class="btn btn-sm btn-outline-primary" onclick="reSync()">Re-Sync RichMenu</button>
+            <button type="button" class="btn btn-sm btn-outline-primary text-center" onclick="reSync()"><i class="fas fa-cloud-download-alt"></i> Re-Sync RichMenu</button>
         </div>
         <div class="col-auto">
             <button type="button" class="btn btn-sm btn-outline-secondary" onclick="refreshRichmenu()"><i class="fas fa-redo"></i> Refresh</button>

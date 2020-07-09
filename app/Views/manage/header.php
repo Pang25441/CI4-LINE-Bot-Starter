@@ -52,8 +52,10 @@
 
     function loadRichMenu() {
         $('[elm-body] .btn').prop('disabled', true)
+        $('#loading-modal').modal('show');
         $.get(site_url + 'loadRichmenu', (data, status) => {
             $('[elm-body] .btn').prop('disabled', false)
+            $('#loading-modal').modal('hide');
             if (status == 'success') {
                 $('[data-list-index]').remove();
 
@@ -116,6 +118,7 @@
 
     function reSync() {
         if (confirm('Sync Richmenu list from LINE OA')) {
+            $('#loading-modal').modal('show');
             $('[elm-body] .btn').prop('disabled', true)
             $.get(site_url + 'syncRichMenu', (data, status) => {
                 $('[elm-body] .btn').prop('disabled', false)
@@ -123,6 +126,7 @@
                     // alert('Done !')
                     loadRichMenu();
                 } else {
+                    $('#loading-modal').modal('hide');
                     alert('Sync Failed')
                 }
             })
