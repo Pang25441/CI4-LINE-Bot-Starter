@@ -104,7 +104,7 @@
 </div>
 
 <script>
-    var site_url = '<?php echo site_url(); ?>'
+    var site_url = '<?php echo site_url('Manage/Richmenu'); ?>/'
 
     $(document).ready(() => {
         loadRichMenu();
@@ -115,7 +115,7 @@
 
     function loadRichMenu() {
         $('[elm-body] .btn').prop('disabled', true)
-        $.get(site_url + '/Manage/Richmenu/loadRichmenu', (data, status) => {
+        $.get(site_url + 'loadRichmenu', (data, status) => {
             $('[elm-body] .btn').prop('disabled', false)
             if (status == 'success') {
                 $('[data-list-index]').remove();
@@ -181,7 +181,7 @@
     function reSync() {
         if (confirm('Sync Richmenu list from LINE OA')) {
             $('[elm-body] .btn').prop('disabled', true)
-            $.get(site_url + '/Manage/Richmenu/syncRichMenu', (data, status) => {
+            $.get(site_url + 'syncRichMenu', (data, status) => {
                 $('[elm-body] .btn').prop('disabled', false)
                 if (status == 'success') {
                     // alert('Done !')
@@ -225,7 +225,7 @@
     function deleteRichMenu(id) {
         if(confirm('Delete?'))
         {
-            $.post(site_url + '/Manage/Richmenu/deleteRichmenu', { id: id },
+            $.post(site_url + 'deleteRichmenu', { id: id },
             (data, status) => {
                 console.log(status)
                 console.log(data)
@@ -243,7 +243,7 @@
 
     function loadImage(richMenuId) 
     {
-        $.get(site_url + '/Manage/Richmenu/loadImage/'+richMenuId, (data, status) => {
+        $.get(site_url + 'loadImage/'+richMenuId, (data, status) => {
                 $('[elm-body] .btn').prop('disabled', false)
                 if (status == 'success') {
                     // alert('Done !')
@@ -258,7 +258,7 @@
     {
         if(confirm('Set Rich Menu to Default?'))
         {
-            $.post(site_url + '/Manage/Richmenu/setDefault', { id: id },
+            $.post(site_url + 'setDefault', { id: id },
             (data, status) => {
                 console.log(status)
                 console.log(data)
@@ -278,7 +278,7 @@
     {
         if(confirm('Remove Default Rich Menu ?'))
         {
-            $.post(site_url + '/Manage/Richmenu/unsetDefault', { id: id },
+            $.post(site_url + 'unsetDefault', { id: id },
             (data, status) => {
                 console.log(status)
                 console.log(data)

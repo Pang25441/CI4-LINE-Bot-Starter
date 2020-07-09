@@ -1,6 +1,6 @@
 <div class="container-fluid">
-    <div id="liff-content"></div>
-    <div id="liff-loading" class="d-none">
+    <div id="liff-content" class="d-none"></div>
+    <div id="liff-loading" class="">
         <div class="m-auto lds-ripple">
             <div></div>
             <div></div>
