@@ -11,14 +11,22 @@
         <i class="fas fa-exclamation-triangle text-danger"></i>
         <h1 style="font-weight: bold;">Page Unavailable</h1>
     </div>
+    <div id="liff-success" class="d-none text-center">
+        <i class="fas fa-check-circle text-success"></i>
+        <h3 class="text"></h3>
+        <button type="button" class="btn btn-lg btn-success" onclick="closeLiff()">Done</button>
+    </div>
 </div>
 
 <style>
-    #liff-error {
+    #liff-error, #liff-success i {
         font-size: min(50vw, 40vh);
     }
     .loading-text {
         margin-top: min(25vw, 20vh);
+    }
+    #liff-success button {
+        width: 50vw;
     }
     .lds-ripple {
     display: block;

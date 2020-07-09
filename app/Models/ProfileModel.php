@@ -14,10 +14,7 @@ class ProfileModel extends Model
                                     'firstname', 
                                     'lastname', 
                                     'email', 
-                                    'password', 
-                                    'created_datetime', 
-                                    'updated_datetime',
-                                    'deleted_datetime'
+                                    'password'
                                 ];
 
     protected $useTimestamps = true;

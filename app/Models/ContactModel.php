@@ -19,11 +19,8 @@ class ContactModel extends Model
                                     'following', 
                                     'banned', 
                                     'banned_reason', 
-                                    'created_datetime', 
                                     'follow_datetime', 
                                     'unfollow_datetime', 
-                                    'updated_datetime',
-                                    'deleted_datetime'
                                 ];
 
     protected $useTimestamps = true;

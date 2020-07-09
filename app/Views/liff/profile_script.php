@@ -13,8 +13,6 @@
             })
             .then(() => {
                 // start to use LIFF's api
-                const idToken = liff.getIDToken();
-                console.log(idToken)
                 initializeApp();
             })
             .catch((err) => {
@@ -48,9 +46,11 @@
             $('#liff-error').removeClass('d-none');
             return false;
         }
-        
+
+        const accessToken = liff.getAccessToken();
+
         $.post(site_url + 'loadform', {
-            idToken: idToken
+            accessToken: accessToken
         }, (data, status) => {
             $('#liff-loading').addClass('d-none');
             if (status == 'success') {
@@ -61,6 +61,37 @@
                 $('#liff-error').removeClass('d-none');
             }
         })
+    }
+
+    function submitForm() {
+        $('#liff-loading').removeClass('d-none');
+        $('#liff-content').addClass('d-none');
+        const accessToken = liff.getAccessToken();
+        $('#accessToken').val(accessToken);
+        var parameter = $('form').serialize()
+        console.log(parameter)
+
+        $.post(site_url + 'saveform', parameter, (data, status) => {
+            $('#liff-loading').addClass('d-none');
+            if (status == 'success') {
+                if (data.result) {
+                    $('#liff-success').find('.text').text(data.message);
+                    $('#liff-content').addClass('d-none');
+                    $('#liff-success').removeClass('d-none');
+                } else {
+                    $('#liff-content').removeClass('d-none');
+                }
+            } else {
+                $('#liff-content').addClass('d-none');
+                $('#liff-error').removeClass('d-none');
+            }
+        })
+
+        return false
+    }
+
+    function closeLiff() {
+        liff.closeWindow();
     }
 </script>
 
