@@ -12,4 +12,7 @@ class Line extends BaseConfig
     
     public $channelAccessToken = "";
 
+
+    public $loginChannelId = "";
+    public $loginChannelSecret = "";
 }
