@@ -14,6 +14,7 @@ class RichmenuModel extends Model
                                     'richMenuId',
                                     'name',
                                     'data',
+                                    'isDefault',
                                     'created_datetime', 
                                     'updated_datetime',
                                     'deleted_datetime'

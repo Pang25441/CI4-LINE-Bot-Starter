@@ -17,7 +17,8 @@ class Linebot
 
 	function __construct($event = null)
 	{
-		if ($event) {
+		if ($event) 
+		{
 			$this->event = $event;
 			$this->source = $this->event->source;
 			$this->source_type = $this->event->source->type;
@@ -35,13 +36,13 @@ class Linebot
 		$response = $this->bot->getProfile($userId);
 
 		$profile = $response->getJSONDecodedBody();
-		// echo $profile['displayName'];
-		// echo $profile['pictureUrl'];
-		// echo $profile['statusMessage'];
 
-		if ($response->isSucceeded()) {
+		if ($response->isSucceeded()) 
+		{
 			return $profile;
-		} else {
+		} 
+		else 
+		{
 			log_message('info', var_export($profile, true));
 			return false;
 		}
@@ -57,7 +58,8 @@ class Linebot
 
 	public function sendText($userId = null, $text = null)
 	{
-		if (!$text || !$userId) {
+		if (!$text || !$userId) 
+		{
 			return false;
 		}
 
@@ -70,7 +72,8 @@ class Linebot
 
 	public function replyText($replyToken = null, $text = null)
 	{
-		if (!$text || !$replyToken) {
+		if (!$text || !$replyToken) 
+		{
 			return false;
 		}
 
@@ -83,8 +86,10 @@ class Linebot
 
 	private function buildTextMessage($text)
 	{
-		if (is_array($text)) {
-			switch (count($text)) {
+		if (is_array($text)) 
+		{
+			switch (count($text)) 
+			{
 				case 1:
 					$textMessageBuilder = new MessageBuilder\TextMessageBuilder($text[0]);
 					break;
@@ -103,7 +108,9 @@ class Linebot
 				default:
 					$textMessageBuilder = null;
 			}
-		} else {
+		} 
+		else 
+		{
 			$textMessageBuilder = new MessageBuilder\TextMessageBuilder($text);
 		}
 
@@ -115,9 +122,12 @@ class Linebot
 	{
 		$response = $this->bot->getRichMenuList();
 
-		if ($this->responseHandler('getRichmenuList', $response)) {
+		if ($this->responseHandler('getRichmenuList', $response)) 
+		{
 			return $response->getJSONDecodedBody();
-		} else {
+		} 
+		else 
+		{
 			return false;
 		}
 	}
@@ -126,50 +136,21 @@ class Linebot
 	{
 		$response = $this->bot->downloadRichMenuImage($richMenuId);
 
-		if ($this->responseHandler('getRichmenuList', $response)) {
+		if ($this->responseHandler('getRichmenuList', $response)) 
+		{
 			return $response->getJSONDecodedBody();
-		} else {
+		} 
+		else 
+		{
 			return false;
 		}
 	}
 
 	public function createRichmenu($richMenuJSON)
 	{
-		$curl = curl_init();
-		curl_setopt_array($curl, array(
-			CURLOPT_URL => 'https://api.line.me/v2/bot/richmenu',
-			CURLOPT_RETURNTRANSFER => true,
-			// CURLOPT_ENCODING => "",
-			CURLOPT_MAXREDIRS => 10,
-			CURLOPT_TIMEOUT => 30,
-			CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-			CURLOPT_CUSTOMREQUEST => "POST",
-			CURLOPT_POSTFIELDS => $richMenuJSON,
-			CURLOPT_HTTPHEADER => array(
-				"authorization: Bearer " . $this->line->channelAccessToken,
-				"cache-control: no-cache",
-				"content-type: application/json"
-			),
-		));
-		$response = curl_exec($curl);
-		$err = curl_error($curl);
-		$status = curl_getinfo($curl);
+		$response = $this->httpClient('POST', 'https://api.line.me/v2/bot/richmenu', $richMenuJSON, 'createRichmenu');
 
-		$http_code = $status['http_code'];
-
-		curl_close($curl);
-
-		if ($http_code !== 200) 
-		{
-			log_message('error', $err);
-			log_message('error', $response);
-			return false;
-		} 
-		else 
-		{
-			$_response = json_decode($response);
-			return $_response->richMenuId;
-		}
+		return $response ? $response->richMenuId : false;
 	}
 
 	function uploadRichmenuImage($richMenuId, $imagePath) 
@@ -179,20 +160,26 @@ class Linebot
 		{
 			log_message('error','Rich Menu Image Type Invalid');
 			log_message('error',var_export($contentType,true));
+			$this->deleteRichmenu($richMenuId);
 			return false;
 		}
 
 		$response = $this->bot->uploadRichMenuImage($richMenuId, $imagePath, $contentType);
 		
 		return $this->responseHandler('uploadRichmenuImage',$response);
-
 	}
 
 	function downloadRichmenuImage($richMenuId)
 	{
 		$response = $this->bot->downloadRichMenuImage($richMenuId);
-
-		return $response;
+		if($this->responseHandler('downloadRichmenuImage',$response)) 
+		{
+			return $response;
+		}
+		else
+		{
+			return false;
+		}
 	}
 	
 	function deleteRichmenu($richMenuId) 
@@ -200,6 +187,40 @@ class Linebot
 		$response = $this->bot->deleteRichMenu($richMenuId);
 		return $this->responseHandler('deleteRichmenu',$response);
 	}
+
+	function setDefaultRichMenu($richmenu_name='')
+	{
+		if( $richMenuId = $this->getRichMenuId($richmenu_name) )
+		{
+			# https://api.line.me/v2/bot/user/all/richmenu/{richMenuId}
+			$response = $this->httpClient('POST', "https://api.line.me/v2/bot/user/all/richmenu/$richMenuId", '', 'setDefaultRichMenu');
+			log_message('info',var_export($response,true));
+			return $response ? true : false;
+		}
+
+		return false;
+	}
+
+	function getDefaultRichMenuId()
+	{
+		$response = $this->httpClient('GET', "https://api.line.me/v2/bot/user/all/richmenu", '', 'getDefaultRichMenuId');
+		log_message('info',var_export($response,true));
+		return $response ? $response->richMenuId : false;
+	}
+
+	function cancelDefaultRichMenu() 
+	{
+		$response = $this->httpClient('DELETE', "https://api.line.me/v2/bot/user/all/richmenu", '', 'cancelDefaultRichMenu');
+		return $response ? true : false;
+	}
+
+	function linkRichMenu($richMenuId, $userIds)
+	{
+		# https://api.line.me/v2/bot/richmenu/bulk/link
+		$response = $this->httpClient('POST', "https://api.line.me/v2/bot/richmenu/bulk/link", json_encode(['richMenuId' => $richMenuId, 'userIds' => $userIds]), 'setDefaultRichMenu');
+		return $response ? true : false;
+	}
+
 
 	####################################################################################################################################
 	############################################                                            ############################################
@@ -215,7 +236,8 @@ class Linebot
 		 * 500 = LINE Bot error Use request id for retry later
 		 */
 
-		if ($response->isSucceeded()) {
+		if ($response->isSucceeded()) 
+		{
 			return true;
 		}
 
@@ -227,5 +249,59 @@ class Linebot
 		log_message('info', var_export($body, true));
 
 		return false;
+	}
+
+	private function httpClient($method='POST',$endpoint,$JSONBody,$origin_method = 'httpClient') 
+	{
+		$curl = curl_init();
+		
+		curl_setopt_array($curl, [
+			CURLOPT_URL 			=> $endpoint,
+			CURLOPT_RETURNTRANSFER 	=> true,
+			CURLOPT_MAXREDIRS 		=> 10,
+			CURLOPT_TIMEOUT 		=> 30,
+			CURLOPT_HTTP_VERSION 	=> CURL_HTTP_VERSION_1_1,
+			CURLOPT_CUSTOMREQUEST 	=> $method,
+			CURLOPT_POSTFIELDS 		=> $JSONBody,
+			CURLOPT_HTTPHEADER 		=> [
+										"authorization: Bearer " . $this->line->channelAccessToken,
+										"cache-control: no-cache",
+										"content-type: application/json"
+										],
+		]);
+
+		$response 	= curl_exec($curl);
+		$err 		= curl_error($curl);
+		$status 	= curl_getinfo($curl);
+		$http_code 	= $status['http_code'];
+
+		curl_close($curl);
+
+		if ($http_code !== 200) 
+		{
+			$error_msg = "$origin_method Failed ($http_code)";
+			log_message('error', $error_msg);
+			log_message('info', $response);
+			return false;
+		} 
+		else 
+		{
+			return json_decode($response);
+		}
+	}
+
+	private function getRichMenuId($richmenu_name)
+	{
+		$richmenuModel = new \App\Models\RichmenuModel();
+		$richmenu = $richmenuModel->where('name',$richmenu_name)->first();
+
+		if($richmenu)
+		{
+			return $richmenu['richMenuId'];
+		}
+		else
+		{
+			return false;
+		}
 	}
 }

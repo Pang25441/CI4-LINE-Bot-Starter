@@ -29,6 +29,11 @@ class Richmenu extends Migration
 				'constraint'		=> 2500,
 				'null'				=> true
 			],
+			'isDefault' => [
+				'type'				=> 'TINYINT',
+				'constraint'		=> 1,
+				'null'				=> true
+			],
 			'created_datetime' => [
 				'type'				=> 'DATETIME',
 				'null'				=> true,
