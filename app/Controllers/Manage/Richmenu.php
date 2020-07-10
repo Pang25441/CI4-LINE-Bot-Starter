@@ -122,6 +122,7 @@ class Richmenu extends BaseController
             $result = $linebot->deleteRichmenu($data['richMenuId']);
             if($result) 
             {
+                unlink(ROOTPATH . 'public/richmenu/' . $data['richMenuId'].'.jpg' );
                 $richmenuModel->delete($id);
                 $response = [
                     'save_status' => true,
@@ -228,8 +229,7 @@ class Richmenu extends BaseController
                 $row = $richmenuModel->where('richmenuId', $rich['richMenuId'])->withDeleted()->first();
                 
                 if ($row) {
-                    # Update
-                    $richMenuIds[] = $row['richMenuId'];
+                    # Update?
                 } else {
                     # Insert
                     $data = [
@@ -239,20 +239,40 @@ class Richmenu extends BaseController
                     ];
 
                     $richmenuModel->save($data);
-                    $richMenuIds[] = $rich['richMenuId'];
+                }
+
+                $richMenuIds[] = $rich['richMenuId'];
+
+                $filepath = ROOTPATH. 'public/richmenu/' . $rich['richMenuId'].'.jpg';
+                if(true || !file_exists($filepath))
+                {
+                    $response = $linebot->downloadRichmenuImage($rich['richMenuId']);
+                    if($response->getHTTPStatus() == 200)
+                    {
+                        helper('filesystem');
+                        write_file($filepath,$response->getRawBody());
+                    }
                 }
             }
 
-            $deleted = [];
-            foreach ($list['richmenus'] as $rich) {
-                if (!in_array($rich['richMenuId'], $richMenuIds)) {
-                    $deleted[] = $rich['richMenuId'];
-                }
+            $localMenus = [];
+            $allMenus = $richmenuModel->withDeleted()->findAll();
+            foreach ($allMenus as $rich) {
+                $localMenus[] = $rich['richMenuId'];
             }
+            $deleted1 = array_diff($richMenuIds,$localMenus);
+            $deleted2 = array_diff($localMenus,$richMenuIds);
+            $deleted = array_merge($deleted1,$deleted2);
             
             if ($deleted) {
+                foreach($deleted AS $filename)
+                {
+                    $filepath = ROOTPATH . 'public/richmenu/' . $filename.'.jpg';
+                    if(file_exists($filepath))
+                    unlink($filepath);
+                }
                 $richmenuModel = new \App\Models\RichmenuModel();
-                $richmenuModel->delete($deleted);
+                $richmenuModel->where('richMenuId',$deleted)->delete();
             }
 
             $defaultRichMenuId = $linebot->getDefaultRichMenuId();
