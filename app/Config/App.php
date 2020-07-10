@@ -21,7 +21,8 @@ class App extends BaseConfig
 	| environments.
 	|
 	*/
-	public $baseURL = 'http://localhost:8080/';
+	// public $baseURL = 'http://localhost:8080/';
+	public $baseURL = 'https://c8410c3d0341.ap.ngrok.io/';
 
 	/*
 	|--------------------------------------------------------------------------
@@ -33,7 +34,7 @@ class App extends BaseConfig
 	| variable so that it is blank.
 	|
 	*/
-	public $indexPage = 'index.php';
+	public $indexPage = '';
 
 	/*
 	|--------------------------------------------------------------------------
