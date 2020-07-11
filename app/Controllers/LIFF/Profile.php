@@ -20,13 +20,20 @@ class Profile extends BaseController
         $this->Me();
     }
 
-    public function Me()
+    public function register()
+    {
+        $this->Me('register');
+    }
+
+    public function Me($type='member')
     {
         $conf = new \Config\Liff();
 
+        $liffId = $type == 'register' ? $conf->liffid['register'] : $conf->liffid['member'];
+
         # Load LIFF initial script
         # Load My Profile Script
-        $header_script = view('liff/liff_script', [ 'liffid' => $conf->liffid['profile'], 'endpoint' => $this->endpoint ]) . view('liff/profile_script');
+        $header_script = view('liff/liff_script', [ 'liffid' => $liffId, 'endpoint' => $this->endpoint ]) . view('liff/profile_script');
 
         # Load My Profile Body
         $data = [
