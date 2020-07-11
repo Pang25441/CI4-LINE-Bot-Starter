@@ -1,7 +1,6 @@
 <script>
     function initializeApp() {
         if (!liff.isLoggedIn()) {
-            // set `redirectUri` to redirect the user to a URL other than the endpoint URL of your LIFF app.
             liff.login();
             return;
         }

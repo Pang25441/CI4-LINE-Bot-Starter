@@ -1,17 +1,17 @@
 <div class="container-fluid">
     <div id="liff-content" class="d-none"></div>
-    <div id="liff-loading" class="">
+    <div id="liff-loading" class="text-monospace">
         <div class="m-auto lds-ripple">
             <div></div>
             <div></div>
         </div>
         <h2 class="loading-text text-center"><?php echo lang('Liff.page_loading') ?></h2>
     </div>
-    <div id="liff-error" class="d-none text-center">
+    <div id="liff-error" class="d-none text-monospace text-center">
         <i class="fas fa-exclamation-triangle text-danger"></i>
         <h1 style="font-weight: bold;"><?php echo lang('Liff.page_unavailable') ?></h1>
     </div>
-    <div id="liff-success" class="d-none text-center">
+    <div id="liff-success" class="d-none text-center text-monospace">
         <i class="fas fa-check-circle text-success"></i>
         <h3 class="text"></h3>
         <button type="button" class="btn btn-lg btn-success" onclick="closeLiff()"><?php echo lang('Liff.btn.done') ?></button>

@@ -2,10 +2,10 @@
 
 namespace App\Controllers\LIFF;
 
-use App\Controllers\LineController;
+use App\Controllers\BaseController;
 use CodeIgniter\Exceptions\PageNotFoundException;
 
-class Profile extends LineController
+class Profile extends BaseController
 {
     private $profile;
     private $endpoint;
@@ -49,12 +49,15 @@ class Profile extends LineController
 
         $contact = $contact = $this->getContact($accessToken);
 
-        if ($contact && $contact['profile_id']) {
-            // Is Member
+        if ($contact && $contact['profile_id']) 
+        {
+            # Is Member
             $isMember = true;
             $profileData = $profileModel->find($contact['profile_id']);
-        } else {
-            // Not Member
+        } 
+        else 
+        {
+            # Not Member
             $profileData = [
                 'id'        => '',
                 'firstname' => $this->profile->displayName,
@@ -94,6 +97,7 @@ class Profile extends LineController
 
         $sendText = false;
         $message = lang("Liff.fail_edit_profile");
+
         if($saved)
         {
             $message = lang("Liff.finish_edit_profile");
@@ -144,6 +148,14 @@ class Profile extends LineController
         }
 
         $contact = $this->getContact($accessToken);
+        
+        $profileModel = new \App\Models\ProfileModel();
+        $profile = $profileModel->find($contact['profile_id']);
+
+        if(!$profile)
+        {
+            throw PageNotFoundException::forPageNotFound();
+        }
 
         $url = "https://chart.googleapis.com/chart?cht=qr&chs=500x500&chld=L|1&chl=";
 
@@ -152,19 +164,25 @@ class Profile extends LineController
 
         if(!file_exists($filepath)){ mkdir($filepath); }
 
-        if(!file_exists($filepath.$filename) || $reload=='reload'){
+        if(!file_exists($filepath.$filename) || $reload=='reload')
+        {
             $qr = file_get_contents($url.$contact['uniqueId']);
             write_file($filepath.$filename,$qr);
         }
 
         $type = pathinfo($filepath.$filename, PATHINFO_EXTENSION);
         $data = file_get_contents($filepath.$filename);
-        if(!$data) {
+
+        if(!$data) 
+        {
             throw PageNotFoundException::forPageNotFound();
         }
+
         $base64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
 
-        echo view('liff/myqr_show', [ 'image_data'=>$base64 ]);
+        $information = $profile['firstname'] . ' ' . $profile['lastname'];
+
+        echo view('liff/myqr_show', [ 'image_data'=>$base64, 'information'=> $information ]);
     }
 
     private function getContact($accessToken)
@@ -175,7 +193,8 @@ class Profile extends LineController
 
         $response = $liff->verifyAccessToken($accessToken);
 
-        if ($response && $response->client_id == $line->loginChannelId) {
+        if ($response && $response->client_id == $line->loginChannelId) 
+        {
             $this->profile = $liff->getProfile($accessToken);
             $contact = $this->profile ? $contactModel->where('userId', $this->profile->userId)->first() : false;
 
@@ -186,10 +205,14 @@ class Profile extends LineController
                     # Banned LINE Account
                     throw PageNotFoundException::forPageNotFound();
                 }
+
+                # Set Language
                 $this->request->setLocale($contact['language']);
             }
             return $contact;
-        } else {
+        } 
+        else 
+        {
             // Token invalid
             throw PageNotFoundException::forPageNotFound();
             return false;
