@@ -5,16 +5,16 @@
             <div></div>
             <div></div>
         </div>
-        <h2 class="loading-text text-center">Loading</h2>
+        <h2 class="loading-text text-center"><?php echo lang('Liff.page_loading') ?></h2>
     </div>
     <div id="liff-error" class="d-none text-center">
         <i class="fas fa-exclamation-triangle text-danger"></i>
-        <h1 style="font-weight: bold;">Page Unavailable</h1>
+        <h1 style="font-weight: bold;"><?php echo lang('Liff.page_unavailable') ?></h1>
     </div>
     <div id="liff-success" class="d-none text-center">
         <i class="fas fa-check-circle text-success"></i>
         <h3 class="text"></h3>
-        <button type="button" class="btn btn-lg btn-success" onclick="closeLiff()">Done</button>
+        <button type="button" class="btn btn-lg btn-success" onclick="closeLiff()"><?php echo lang('Liff.btn.done') ?></button>
     </div>
 </div>
 

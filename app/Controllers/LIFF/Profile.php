@@ -4,43 +4,51 @@ namespace App\Controllers\LIFF;
 
 use App\Controllers\LineController;
 use CodeIgniter\Exceptions\PageNotFoundException;
-use Config\App;
-use ErrorException;
 
 class Profile extends LineController
 {
     private $profile;
+    private $endpoint;
+
+    function __construct()
+    {
+        $this->endpoint = site_url('LIFF/Profile');
+    }
 
     public function index()
     {
-        // Liff Landing
-        // Check token
-        // Load Form
+        $this->Me();
+    }
 
-        //Get Liff ID
+    public function Me()
+    {
         $conf = new \Config\Liff();
 
-        $header_script = view('liff/profile_script', ['liffid' => $conf->liffid['profile']]);
+        # Load LIFF initial script
+        # Load My Profile Script
+        $header_script = view('liff/liff_script', [ 'liffid' => $conf->liffid['profile'], 'endpoint' => $this->endpoint ]) . view('liff/profile_script');
+
+        # Load My Profile Body
         $data = [
-            'title' => 'My Profile',
-            'header' => $header_script,
-            'body' => view('liff/liff_landing')
+            'title'     => 'My Profile',
+            'header'    => $header_script,
+            'body'      => view('liff/liff_landing')
         ];
 
+        # Load html structure
         echo view('template', $data);
     }
 
     public function loadform()
     {
         helper('form');
-        // Receive 
-
         $profileModel = new \App\Models\ProfileModel();
 
         $accessToken = $this->request->getPost('accessToken');
         $isMember = false;
 
         $contact = $contact = $this->getContact($accessToken);
+
         if ($contact && $contact['profile_id']) {
             // Is Member
             $isMember = true;
@@ -48,17 +56,19 @@ class Profile extends LineController
         } else {
             // Not Member
             $profileData = [
-                'id' => '',
+                'id'        => '',
                 'firstname' => $this->profile->displayName,
-                'lastname' => '',
-                'email' => ''
+                'lastname'  => '',
+                'email'     => ''
             ];
         }
 
         $viewData = [
-            'profile' => $profileData,
-            'isMember' => $isMember
+            'profile'   => $profileData,
+            'isMember'  => $isMember
         ];
+
+        # Load profile body
         echo view('liff/profile_body', $viewData);
     }
 
@@ -107,18 +117,78 @@ class Profile extends LineController
         return $this->response->setJSON(['result'=>$result, 'message'=>$message]);
     }
 
+    function MyQRCode()
+    {
+        $conf = new \Config\Liff();
+
+        $header_script = view('liff/liff_script', [ 'liffid' => $conf->liffid['MyQR'], 'endpoint' => $this->endpoint ]);
+        $header_script .= view('liff/myqr_script');
+        $data = [
+            'title'     => 'My QR Code',
+            'header'    => $header_script,
+            'body'      => view('liff/liff_landing')
+        ];
+
+        echo view('template', $data);
+    }
+
+    function generateQR()
+    {
+        helper('filesystem');
+        $accessToken = $this->request->getPost('accessToken');
+        $reload = $this->request->getPost('reload');
+
+        if(!$accessToken)
+        {
+            throw PageNotFoundException::forPageNotFound();
+        }
+
+        $contact = $this->getContact($accessToken);
+
+        $url = "https://chart.googleapis.com/chart?cht=qr&chs=500x500&chld=L|1&chl=";
+
+        $filepath = ROOTPATH . 'public/myqrcode/';
+        $filename = $contact['id'] . '-' . $contact['uniqueId'] . '.jpg';
+
+        if(!file_exists($filepath)){ mkdir($filepath); }
+
+        if(!file_exists($filepath.$filename) || $reload=='reload'){
+            $qr = file_get_contents($url.$contact['uniqueId']);
+            write_file($filepath.$filename,$qr);
+        }
+
+        $type = pathinfo($filepath.$filename, PATHINFO_EXTENSION);
+        $data = file_get_contents($filepath.$filename);
+        if(!$data) {
+            throw PageNotFoundException::forPageNotFound();
+        }
+        $base64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
+
+        echo view('liff/myqr_show', [ 'image_data'=>$base64 ]);
+    }
+
     private function getContact($accessToken)
     {
         $liff = new \App\Libraries\Liff();
         $line = new \Config\Line();
-        $profileModel = new \App\Models\ProfileModel();
         $contactModel = new \App\Models\ContactModel();
 
         $response = $liff->verifyAccessToken($accessToken);
 
         if ($response && $response->client_id == $line->loginChannelId) {
             $this->profile = $liff->getProfile($accessToken);
-            return $this->profile ? $contactModel->where('userId', $this->profile->userId)->first() : false;
+            $contact = $this->profile ? $contactModel->where('userId', $this->profile->userId)->first() : false;
+
+            if($contact)
+            {
+                if($contact['banned'] == 1)
+                {
+                    # Banned LINE Account
+                    throw PageNotFoundException::forPageNotFound();
+                }
+                $this->request->setLocale($contact['language']);
+            }
+            return $contact;
         } else {
             // Token invalid
             throw PageNotFoundException::forPageNotFound();
