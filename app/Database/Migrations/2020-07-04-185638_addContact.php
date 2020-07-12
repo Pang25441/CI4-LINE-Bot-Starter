@@ -86,8 +86,8 @@ class AddContacts extends Migration
 			]
 		])
 		->addPrimaryKey('id')
-		->addForeignKey('profile_id','profiles','id','SET NULL','CASCADE')
-		->addForeignKey('richmenu_id','richmenu','id','SET NULL','CASCADE')
+		->addForeignKey('profile_id','profiles','id','CASCADE','SET NULL')
+		->addForeignKey('richmenu_id','richmenu','id','CASCADE','SET NULL')
 		->createTable('contacts');
 	}
 

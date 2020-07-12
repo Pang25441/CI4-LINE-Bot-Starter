@@ -119,6 +119,11 @@ class Profile extends BaseController
                     $saved = false;
                     $message = lang("Liff.fail_new_profile");
                 }
+                else
+                {
+                    $linebot = new \App\Libraries\Linebot();
+                    $linebot->linkRichMenuProfile('Member Menu', $profile_id);
+                }
             }
         }
 
