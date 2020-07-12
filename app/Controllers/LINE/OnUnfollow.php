@@ -3,18 +3,15 @@
 namespace App\Controllers\LINE;
 
 use App\Controllers\LineController;
-use \LINE\LINEBot;
-use \LINE\LINEBot\HTTPClient\CurlHTTPClient;
-use \LINE\LINEBot\MessageBuilder;
 
 class OnUnfollow extends LineController
 {
-    private $conf ; 
-
     public function index()
     {
-        $this->conf = new \Config\Line();
-
-        echo  'OnUnfollow';
+        $contactModel = new \App\Models\ContactModel();
+        $contact = $contactModel->where('userId', $this->userId)->first();
+        $contact['following'] = 0;
+        $contact['unfollow_datetime'] = date('Y-m-d H:i:s');
+        $contactModel->save($contact);
     }
 }

@@ -2,59 +2,60 @@
 
 use CodeIgniter\Database\Migration;
 
-class AddProfiles extends Migration
+class Richmenu extends Migration
 {
 	public function up()
 	{
 		$this->forge->addField([
 			'id' => [
-				'type'				=> 'INT',
+				'type' => 'INT',
 				'constraint' 		=> 10,
 				'unsigned'			=> true,
 				'auto_increment'	=> true
 			],
-			'firstname' => [
+			'richMenuId' => [
 				'type'				=> 'VARCHAR',
-				'constraint' 		=> 100,
+				'constraint'		=> 50,
+				'unique'			=> true,
+			],
+			'name' => [
+				'type'				=> 'VARCHAR',
+				'constraint'		=> 100,
+				'null'				=> true,
+				'unique'			=> true
+			],
+			'data' => [
+				'type'				=> 'VARCHAR',
+				'constraint'		=> 2500,
 				'null'				=> true
 			],
-			'lastname' => [
-				'type'				=> 'VARCHAR',
-				'constraint' 		=> 100,
-				'null'				=> true
-			],
-			'email' => [
-				'type'				=> 'VARCHAR',
-				'constraint' 		=> 100,
-				'null'				=> true
-			],
-			'password' => [
-				'type'				=> 'VARCHAR',
-				'constraint' 		=> 100,
+			'isDefault' => [
+				'type'				=> 'TINYINT',
+				'constraint'		=> 1,
 				'null'				=> true
 			],
 			'created_datetime' => [
 				'type'				=> 'DATETIME',
-				'null'				=> true
+				'null'				=> true,
 			],
 			'updated_datetime' => [
 				'type'				=> 'DATETIME',
-				'null'				=> true
+				'null'				=> true,
 			],
 			'deleted_datetime' => [
 				'type'				=> 'DATETIME',
-				'null'				=> true
+				'null'				=> true,
 			]
+
 		])
 		->addPrimaryKey('id')
-		->addUniqueKey('email')
-		->createTable('profiles');
+		->createTable('richmenu');
 	}
 
 	//--------------------------------------------------------------------
 
 	public function down()
 	{
-		$this->forge->dropTable('profiles');
+		$this->forge->dropTable('richmenu');
 	}
 }

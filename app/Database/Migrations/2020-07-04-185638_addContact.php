@@ -15,10 +15,10 @@ class AddContacts extends Migration
 			],
 			'userId' => [
 				'type'				=> 'VARCHAR',
-				'constraint'		=> 32,
+				'constraint'		=> 50,
 				'unique'			=> true,
 			],
-			'display_name' => [
+			'displayName' => [
 				'type'				=> 'VARCHAR',
 				'constraint'		=> 100,
 				'null'				=> true
@@ -55,7 +55,14 @@ class AddContacts extends Migration
 			'banned_reason' => [
 				'type'				=> 'VARCHAR',
 				'constraint'		=> 250,
-				'default'			=> 1,
+				'default'			=> null,
+				'null'				=> true,
+			],
+			'richmenu_id' => [
+				'type'				=> 'INT',
+				'constraint'		=> 10,
+				'default'			=> null,
+				'unsigned'			=> true,
 			],
 			'created_datetime' => [
 				'type'				=> 'DATETIME',
@@ -68,10 +75,19 @@ class AddContacts extends Migration
 			'unfollow_datetime' => [
 				'type'				=> 'DATETIME',
 				'null'				=> true,
+			],
+			'updated_datetime' => [
+				'type'				=> 'DATETIME',
+				'null'				=> true,
+			],
+			'deleted_datetime' => [
+				'type'				=> 'DATETIME',
+				'null'				=> true,
 			]
 		])
 		->addPrimaryKey('id')
-		->addForeignKey('profile_id','profiles','id','CASCADE','CASCADE')
+		->addForeignKey('profile_id','profiles','id','CASCADE','SET NULL')
+		->addForeignKey('richmenu_id','richmenu','id','CASCADE','SET NULL')
 		->createTable('contacts');
 	}
 

@@ -1,7 +1,8 @@
 <?php namespace Config;
 
-use CodeIgniter\Exceptions\PageNotFoundException;
 use Exception;
+use CodeIgniter\Exceptions\PageNotFoundException;
+use LINE\LINEBot\SignatureValidator;
 
 // Create a new instance of our RouteCollection class.
 $routes = Services::routes();
@@ -40,82 +41,59 @@ $routes->add('linecontroller(:any)', function () {
 });
 
 $routes->group('line-webhook', function($routes) {
+	
+	$request = \Config\Services::request();
+	$line = new \Config\Line();
+	$lineroute = new \Config\LineRoute();
 
 	try {
 		$payload = file_get_contents('php://input');
 		if(!$payload) {
-			throw PageNotFoundException::forPageNotFound();
+			return false;
 		}
 	} catch(Exception $e) {
-		throw PageNotFoundException::forPageNotFound();
+		return false;
 	}
-
+	
 	$decoded_payload = json_decode($payload);
+
+	// Validate Signature
+	$line_signature = $request->getServer('HTTP_X_LINE_SIGNATURE');
+	if(!isset($line_signature) || !SignatureValidator::validateSignature($payload, $line->channelSecret, $line_signature)) 
+	{
+		// Signature Invalid
+		return false;
+	}
 
 	if(is_array($decoded_payload->events)){
 		$event = $decoded_payload->events[0];
 		$trigger = '';
-		switch($event->type) {
-			case 'message':
-				switch($event->message->type) {
-					case 'text':
-						log_message('info','TextTrigger');
-						$trigger = 'OnText';
-						break;
 
-					case 'image':
-						log_message('info','ImageTrigger');
-						$trigger = 'OnImage';
-						break;
-
-					case 'video':
-						log_message('info','VideoTrigger');
-						$trigger = 'OnVideo';
-						break;
-						
-					case 'audio':
-						log_message('info','AudioTrigger');
-						$trigger = 'OnAudio';
-						break;
-					
-					case 'file':
-						log_message('info','FileTrigger');
-						$trigger = 'OnFile';
-						break;
-
-					case 'location':
-						log_message('info','LocationTrigger');
-						$trigger = 'OnLocation';
-						break;
-						
-					case 'sticker':
-						log_message('info','StickerTrigger');
-						$trigger = 'OnSticker';
-						break;
-				}
-				break;
-			case 'follow':
-				log_message('info','FollowTrigger');
-				$trigger = 'OnFollow';
-				break;
-
-			case 'unfollow':
-				log_message('info','UnfollowTrigger');
-				$trigger = 'OnUnfollow';
-				break;
-
-			case 'postback':
-				log_message('info','PostbackTrigger');
-				$trigger = 'OnPostback';
-				break;
-
-			default:
-				throw PageNotFoundException::forPageNotFound();
+		if(!in_array($event->source->type, $lineroute->allowSource)  ) {
+			return false;
 		}
 
+		if(isset($lineroute->map[$event->type])){
+			if($event->type == 'message') {
+				$trigger = isset($lineroute->map[$event->type][$event->message->type]) ? $lineroute->map[$event->type][$event->message->type] : null;
+			} else {
+				$trigger = $lineroute->map[$event->type];
+			}
+		} else {
+			return false;
+		}
+		
 		if($trigger) {
+			log_message('info','Trigger: '.$trigger);
 			$routes->add('/', 'LINE/'.$trigger.'::index');
+		} else {
+			log_message('info','Trigger: None');
+			return false;
 		}
+	}
+	else 
+	{
+		return false;
 	}
 
 });
