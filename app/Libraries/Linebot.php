@@ -331,9 +331,10 @@ class Linebot
 	function downloadRichmenuImage($richMenuId)
 	{
 		$response = $this->bot->downloadRichMenuImage($richMenuId);
-		if($this->responseHandler('downloadRichmenuImage',$response)) 
+		$this->responseHandler('downloadRichmenuImage',$response);
+		if($response->getHTTPStatus()==200) 
 		{
-			return $response;
+			return $response->getRawBody();
 		}
 		else
 		{
@@ -530,11 +531,11 @@ class Linebot
 		$err 		= curl_error($curl);
 		$status 	= curl_getinfo($curl);
 		
-		$header_size = curl_getinfo($this->ch,CURLINFO_HEADER_SIZE);
+		$header_size = curl_getinfo($curl, CURLINFO_HEADER_SIZE);
         $result['header'] = substr($response, 0, $header_size);
         $result['body'] = substr( $response, $header_size );
-        $result['http_code'] = curl_getinfo($this -> ch,CURLINFO_HTTP_CODE);
-        $result['last_url'] = curl_getinfo($this -> ch,CURLINFO_EFFECTIVE_URL);
+        $result['http_code'] = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+        $result['last_url'] = curl_getinfo($curl, CURLINFO_EFFECTIVE_URL);
 
 		curl_close($curl);
 
@@ -547,8 +548,7 @@ class Linebot
 		} 
 		else 
 		{
-			// return json_decode($response);
-			return json_decode($result['body']);
+			return json_decode($response);
 		}
 	}
 
