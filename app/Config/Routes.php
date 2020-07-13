@@ -98,6 +98,17 @@ $routes->group('line-webhook', function($routes) {
 
 });
 
+$routes->group('api', function($routes){
+	$routes->grouop('v1', ['namespace' => 'App\API\v1'], function($routes){
+		$routes->get('richmenus', 'Richmenu::list');
+		$routes->get('richmenus/(:id)', 'Richmenu::get/$i');
+		$routes->post('richmenus/create', 'Richmenu::create');
+		$routes->delete('richmenus/(:id)', 'Richmenu::delete/$1');
+		$routes->post('richmenus/default', 'Richmenu::setDefault');
+		$routes->delete('richmenus/default/(:id)', 'Richmenu::unsetDefault/$1');
+	});
+});
+
 /**
  * --------------------------------------------------------------------
  * Additional Routing
