@@ -101,7 +101,9 @@ $routes->group('line-webhook', function($routes) {
 $routes->group('api', function($routes){
 	$routes->group('v1', ['namespace' => 'App\Controllers\API\v1'], function($routes){
 		$routes->get('richmenus', 'Richmenu::all');
+		$routes->get('richmenus/sync', 'Richmenu::sync');
 		$routes->get('richmenu/(:id)', 'Richmenu::get/$i');
+		$routes->post('richmenu/reload1', 'Richmenu::reloadImage');
 		$routes->post('richmenu/create', 'Richmenu::create');
 		$routes->delete('richmenu', 'Richmenu::delete');
 		$routes->post('richmenu/default', 'Richmenu::setDefault');
