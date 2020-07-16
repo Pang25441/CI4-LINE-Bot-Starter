@@ -8,6 +8,6 @@ class OnText extends LineController
 {
     public function index()
     {
-        $this->linebot->replyText($this->replyToken, lang('Line.ThanksForSendMsg'));
+        $this->linebot->replyText(lang('Line.ThanksForSendMsg'));
     }
 }

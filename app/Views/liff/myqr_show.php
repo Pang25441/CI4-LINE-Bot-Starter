@@ -12,6 +12,7 @@
 
 <div class="fixed-bottom text-monospace">
     <div class="col-sm-12 col-md-6 col-lg-4 m-auto pb-4">
+        <button type="button" class="btn btn-block btn-outline-primary" onclick="scanQR()">Scan</button>
         <button type="button" class="btn btn-block btn-success " onclick="closeLiff()"><?php echo lang('Liff.btn.done') ?></button>
     </div>
 </div>
