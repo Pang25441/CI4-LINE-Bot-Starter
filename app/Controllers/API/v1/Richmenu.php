@@ -9,13 +9,11 @@ class Richmenu extends BaseController
 
     function setResponse($body, $stausCode = 200)
     {
-        $this->response
-        ->setStatusCode($stausCode)
-        ->setHeader('Access-Control-Allow-Origin', '*')
-        ->setHeader('Access-Control-Allow-Headers', '*')
-        ->setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, DELETE');
+        $this->response->setHeader('Access-Control-Allow-Origin', '*'); 
+        $this->response->setHeader('Access-Control-Allow-Headers', '*');
+        $this->response->setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, DELETE');
 
-        return $this->response->setJSON($body);
+        return $this->response->setStatusCode($stausCode)->setJSON($body);
     }
     
     function all()
@@ -31,10 +29,6 @@ class Richmenu extends BaseController
                 $data[$k]['image'] = null;
             }
         }
-
-        $this->response->setHeader('Access-Control-Allow-Origin', '*')
-        ->setHeader('Access-Control-Allow-Headers', '*')
-        ->setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, DELETE');   
 
         return $this->setResponse($data);
     }
@@ -142,7 +136,7 @@ class Richmenu extends BaseController
         } 
         else 
         {
-            return $this->setResponse(['save_status'=>false, 'save_message'=>'Rich Menu Image is invalid'],401);
+            return $this->setResponse(['status'=>false, 'message'=>'Rich Menu Image is invalid'],401);
         }
 
         $richmenu_object = $this->request->getPost('richmenudata');
@@ -159,7 +153,7 @@ class Richmenu extends BaseController
             {
                 unlink(WRITEPATH. 'uploads/' . $newName);
             }
-            return $this->setResponse(['save_status'=>false, 'save_message'=>'Rich Menu Name is duplicated'],402);
+            return $this->setResponse(['status'=>false, 'message'=>'Rich Menu Name is duplicated'],402);
         }
 
         $richmenuId = $linebot->createRichmenu($richmenu_object);
@@ -173,12 +167,12 @@ class Richmenu extends BaseController
             } 
             else 
             {
-                return $this->setResponse(['save_status'=>false, 'save_message'=>'Image upload failed.'],500);
+                return $this->setResponse(['status'=>false, 'message'=>'Image upload failed.'],500);
             }
         } 
         else 
         {
-            return $this->setResponse(['save_status'=>false, 'save_message'=>'Rich Menu Create failed.'],500);
+            return $this->setResponse(['status'=>false, 'message'=>'Rich Menu Create failed.'],500);
         }
 
         if($newName && file_exists(WRITEPATH. 'uploads/' . $newName))
@@ -186,12 +180,13 @@ class Richmenu extends BaseController
             unlink(WRITEPATH. 'uploads/' . $newName);
         }
         
-        return $this->setResponse(['save_status'=>true, 'save_message'=>'Success'],200);
+        return $this->setResponse(['status'=>true, 'message'=>'Success'],200);
     }
 
     function reloadImage()
     {
-        $richMenuId = $this->request->getPost('richMenuId');
+        $json = $this->request->getJSON();
+        $richMenuId = $json->richMenuId;
         $linebot = new \App\Libraries\Linebot();
         $image = $linebot->downloadRichmenuImage($richMenuId);
         if($image)
@@ -206,9 +201,46 @@ class Richmenu extends BaseController
         }
     }
 
-    function delete($id)
+    function delete()
     {
+        $json = $this->request->getJSON();
+        $id = (int)$json->id;
+        $richmenuModel = new \App\Models\RichmenuModel();
+        $data = $richmenuModel->find($id);
+        $status = 200;
 
+        if($data)
+        {
+            $linebot = new \App\Libraries\Linebot();
+            $result = $linebot->deleteRichmenu($data['richMenuId']);
+            if($result) 
+            {
+                unlink(ROOTPATH . 'public/richmenu/' . $data['richMenuId'].'.jpg' );
+                $richmenuModel->delete($id);
+                $response = [
+                    'status' => true,
+                    'message' => 'Rich Menu Deleted.'
+                ];
+            }
+            else
+            {
+                $response = [
+                    'status' => false,
+                    'message' => 'Rich Menu Delete failed.' 
+                ];
+                $status = 400;
+            }
+        }
+        else
+        {
+            $response = [
+                'status' => false,
+                'message' => 'Rich Menu Not found.'
+            ];
+            $status = 404;
+        }
+
+        return $this->setResponse($response,$status);
     }
 
     function setDefault()

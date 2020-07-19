@@ -325,7 +325,7 @@ class Linebot
 
 		$response = $this->bot->uploadRichMenuImage($richMenuId, $imagePath, $contentType);
 		
-		return $this->responseHandler('uploadRichmenuImage',$response);
+		return $this->responseHandler('uploadRichmenuImage',$response) !== false ? true : false;
 	}
 
 	function downloadRichmenuImage($richMenuId)
@@ -345,7 +345,7 @@ class Linebot
 	function deleteRichmenu($richMenuId) 
 	{
 		$response = $this->bot->deleteRichMenu($richMenuId);
-		return $this->responseHandler('deleteRichmenu',$response);
+		return $this->responseHandler('deleteRichmenu',$response) !== false ? true : false;
 	}
 
 	function setDefaultRichMenu($richmenu_name='')
