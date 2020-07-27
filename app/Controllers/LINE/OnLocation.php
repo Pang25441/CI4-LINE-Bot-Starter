@@ -8,6 +8,6 @@ class OnLocation extends LineController
 {
     public function index()
     {
-        echo  'OnLocation';
+        log_message('debug','OnLocation');
     }
 }

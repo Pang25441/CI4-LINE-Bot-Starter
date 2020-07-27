@@ -6,10 +6,8 @@ use App\Controllers\LineController;
 
 class OnSticker extends LineController
 {
-    private $conf ; 
-
     public function index()
     {
-        echo  'OnSticker';
+        log_message('debug','OnSticker');
     }
 }

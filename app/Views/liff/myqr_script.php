@@ -15,14 +15,14 @@
         })
     }
 
-    function loadQR(reload=false) {
+    function loadQR(reload = false) {
 
         if (!liff.isLoggedIn()) {
             showError()
             return false;
         }
 
-        if(reload && !confirm('Reload QR Code Image?')) {
+        if (reload && !confirm('Reload QR Code Image?')) {
             return false
         }
 
@@ -34,23 +34,38 @@
             accessToken: accessToken,
             reload: ''
         }
-        if(reload)
-        {
+        if (reload) {
             param.reload = 'reload'
         }
 
-        $.post(site_url+'generateQR', param, (data,status)=>{
-            if(status=='success')
-            {
+        $.post(site_url + 'generateQR', param, (data, status) => {
+            if (status == 'success') {
                 showContent(data)
-            }
-            else
-            {
+            } else {
                 showError()
             }
-        }).fail(()=>{
+        }).fail(() => {
             showError()
         })
         return false;
+    }
+
+    function scanQR() {
+        if (liff.scanCode) {
+            liff.scanCode().then(result => {
+                if (result.value) {
+                    liff.sendMessages([{
+                            type: 'text',
+                            text: result.value
+                        }])
+                        .then(() => {
+                            console.log('message sent');
+                        })
+                        .catch((err) => {
+                            console.log('error', err);
+                        });
+                }
+            });
+        }
     }
 </script>
