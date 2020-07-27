@@ -84,10 +84,10 @@ $routes->group('line-webhook', function($routes) {
 		}
 		
 		if($trigger) {
-			log_message('info','Trigger: '.$trigger);
+			log_message('debug','Route: '.$trigger);
 			$routes->add('/', 'LINE/'.$trigger.'::index');
 		} else {
-			log_message('info','Trigger: None');
+			log_message('debug','Route: None');
 			return false;
 		}
 	}
@@ -96,6 +96,30 @@ $routes->group('line-webhook', function($routes) {
 		return false;
 	}
 
+});
+
+$routes->group('api', function($routes){
+	$routes->group('v1', ['namespace' => 'App\Controllers\API\v1'], function($routes){
+		$method = @$_SERVER['REQUEST_METHOD'];
+		if($method == "OPTIONS") {
+			header('Access-Control-Allow-Origin: *');
+			header("Access-Control-Allow-Headers: *");
+			header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
+			die();
+		}
+		$routes->get('richmenus', 'Richmenu::all');
+		$routes->get('richmenus/sync', 'Richmenu::sync');
+		$routes->get('richmenu/(:id)', 'Richmenu::get/$i');
+		$routes->post('richmenu/reload', 'Richmenu::reloadImage');
+		$routes->post('richmenu/create', 'Richmenu::create');
+		$routes->post('richmenu/delete', 'Richmenu::delete');
+		$routes->post('richmenu/default', 'Richmenu::setDefault');
+		$routes->post('richmenu/unset', 'Richmenu::unsetDefault');
+
+		$routes->post('profile/get', 'Profile::get');
+		$routes->post('profile/save', 'Profile::save');
+		$routes->post('profile/qr', 'Profile::qr');
+	});
 });
 
 /**

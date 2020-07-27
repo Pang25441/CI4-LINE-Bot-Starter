@@ -8,6 +8,6 @@ class OnFile extends LineController
 {
     public function index()
     {
-        echo  'OnFile';
+        log_message('debug','OnFile');
     }
 }

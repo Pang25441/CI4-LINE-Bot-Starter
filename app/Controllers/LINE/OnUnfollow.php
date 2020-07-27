@@ -8,6 +8,8 @@ class OnUnfollow extends LineController
 {
     public function index()
     {
+        log_message('debug','OnUnfollow');
+        
         $contactModel = new \App\Models\ContactModel();
         $contact = $contactModel->where('userId', $this->userId)->first();
         $contact['following'] = 0;

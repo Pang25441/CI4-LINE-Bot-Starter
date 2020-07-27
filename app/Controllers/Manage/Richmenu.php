@@ -150,11 +150,11 @@ class Richmenu extends BaseController
 
     public function loadImage($richMenuId) {
         $linebot = new Linebot();
-        $response = $linebot->downloadRichmenuImage($richMenuId);
-        if($response->getHTTPStatus() == 200)
+        $image = $linebot->downloadRichmenuImage($richMenuId);
+        if($image)
         {
             helper('filesystem');
-            write_file(ROOTPATH. 'public/richmenu/' . $richMenuId.'.jpg',$response->getRawBody());
+            write_file(ROOTPATH. 'public/richmenu/' . $richMenuId.'.jpg', $image);
         }
     }
 
@@ -246,11 +246,11 @@ class Richmenu extends BaseController
                 $filepath = ROOTPATH. 'public/richmenu/' . $rich['richMenuId'].'.jpg';
                 if(true || !file_exists($filepath))
                 {
-                    $response = $linebot->downloadRichmenuImage($rich['richMenuId']);
-                    if($response->getHTTPStatus() == 200)
+                    $image = $linebot->downloadRichmenuImage($rich['richMenuId']);
+                    if($image)
                     {
                         helper('filesystem');
-                        write_file($filepath,$response->getRawBody());
+                        write_file($filepath, $image);
                     }
                 }
             }
