@@ -8,6 +8,6 @@ class OnImage extends LineController
 {
     public function index()
     {
-        echo  'OnImage';
+        log_message('debug','OnImage');
     }
 }

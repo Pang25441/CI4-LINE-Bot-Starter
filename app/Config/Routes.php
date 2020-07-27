@@ -84,10 +84,10 @@ $routes->group('line-webhook', function($routes) {
 		}
 		
 		if($trigger) {
-			log_message('info','Trigger: '.$trigger);
+			log_message('debug','Route: '.$trigger);
 			$routes->add('/', 'LINE/'.$trigger.'::index');
 		} else {
-			log_message('info','Trigger: None');
+			log_message('debug','Route: None');
 			return false;
 		}
 	}

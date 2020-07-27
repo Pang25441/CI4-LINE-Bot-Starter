@@ -9,7 +9,7 @@ class Linebot
 {
 	protected $event = null;
 	protected $source = null;
-	protected $source_type = null;
+	protected $sourceType = null;
 	protected $replyToken = null;
 
 	protected $line;
@@ -21,7 +21,7 @@ class Linebot
 		{
 			$this->event = $event;
 			$this->source = $this->event->source;
-			$this->source_type = $this->event->source->type;
+			$this->sourceType = $this->event->source->type;
 			$this->replyToken = $this->event->replyToken;
 		}
 
@@ -43,9 +43,49 @@ class Linebot
 		} 
 		else 
 		{
-			log_message('info', var_export($profile, true));
+			log_message('debug', 'getProfile ' . var_export($profile, true));
 			return false;
 		}
+	}
+
+	public function getProfileGroup($groupId, $userId)
+	{
+		$response = $this->bot->getGroupMemberProfile($groupId, $userId);
+
+		$profile = $response->getJSONDecodedBody();
+
+		if ($response->isSucceeded()) 
+		{
+			return $profile;
+		} 
+		else 
+		{
+			log_message('debug', 'getProfileGroup ' . var_export($profile, true));
+			return false;
+		}
+	}
+
+	public function getProfileRoom($roomId, $userId)
+	{
+		$response = $this->bot->getRoomMemberProfile($roomId, $userId);
+
+		$profile = $response->getJSONDecodedBody();
+
+		if ($response->isSucceeded()) 
+		{
+			return $profile;
+		} 
+		else 
+		{
+			log_message('debug', 'getProfileRoom ' . var_export($profile, true));
+			return false;
+		}
+	}
+
+	public function getGroupSummary($groupId)
+	{
+		$summary = $this->httpClient('GET', "https://api.line.me/v2/bot/group/$groupId/summary", '' ,'getGroupSummary');
+		return $summary;
 	}
 
 	####################################################################################################################################
@@ -354,7 +394,7 @@ class Linebot
 		{
 			# https://api.line.me/v2/bot/user/all/richmenu/{richMenuId}
 			$response = $this->httpClient('POST', "https://api.line.me/v2/bot/user/all/richmenu/$richMenuId", '', 'setDefaultRichMenu');
-			log_message('info',var_export($response,true));
+			log_message('debug', 'setDefaultRichMenu ' . var_export($response,true));
 			return $response ? true : false;
 		}
 
@@ -364,7 +404,7 @@ class Linebot
 	function getDefaultRichMenuId()
 	{
 		$response = $this->httpClient('GET', "https://api.line.me/v2/bot/user/all/richmenu", '', 'getDefaultRichMenuId');
-		log_message('info',var_export($response,true));
+		log_message('debug', 'getDefaultRichMenuId ' . var_export($response,true));
 		return $response ? $response->richMenuId : false;
 	}
 
@@ -501,7 +541,7 @@ class Linebot
 		
 		$error_msg = "$origin_method (ReqId: $requestId) Failed ($httpStatusCode)";
 		log_message('error', $error_msg);
-		log_message('info', var_export($body, true));
+		log_message('debug', 'responseHandler ' . var_export($body, true));
 
 		return false;
 	}
@@ -543,7 +583,7 @@ class Linebot
 		{
 			$error_msg = "$origin_method Failed ($status[http_code])";
 			log_message('error', $error_msg);
-			log_message('info', $response);
+			log_message('debug', 'httpClient ' . $response);
 			return false;
 		} 
 		else 

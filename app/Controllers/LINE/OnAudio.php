@@ -8,6 +8,6 @@ class OnAudio extends LineController
 {
     public function index()
     {
-        echo  'OnAudio';
+        log_message('debug','OnAudio');
     }
 }

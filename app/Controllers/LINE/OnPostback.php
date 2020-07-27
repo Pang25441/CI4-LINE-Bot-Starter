@@ -8,6 +8,6 @@ class OnPostback extends LineController
 {
     public function index()
     {
-        echo  'OnPostback';
+        log_message('debug','OnPostback');
     }
 }

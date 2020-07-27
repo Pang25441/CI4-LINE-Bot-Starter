@@ -8,6 +8,6 @@ class OnVideo extends LineController
 {
     public function index()
     {
-        echo  'OnVideo';
+        log_message('debug','OnVideo');
     }
 }

@@ -2,7 +2,15 @@
 
 use CodeIgniter\Config\BaseConfig;
 
-class LineRoute extends BaseConfig {
+class LineRoute extends BaseConfig 
+{
+
+    /**
+     * Allow source type
+     * Default: ['user','group','room']
+     */
+    public $allowSource = ['user','group'];
+
 
     /**
      * Map webhook event to the Controllers
@@ -18,14 +26,14 @@ class LineRoute extends BaseConfig {
             'location'  => 'OnLocation',
             'sticker'   => 'OnSticker',
         ],
-        'follow'    => 'OnFollow',
-        'unfollow'  => 'OnUnfollow',
-        'postback'  => 'OnPostback'
-    ];
+        'follow'        => 'OnFollow',
+        'unfollow'      => 'OnUnfollow',
+        'postback'      => 'OnPostback',
 
-    /**
-     * Allow source type
-     * Default: ['user','group','room']
-     */
-    public $allowSource = ['user'];
+        // Group,Room Event
+        'join'          => 'OnJoinGroup',
+        'leave'         => 'OnLeaveGroup',
+        'memberJoined'  => 'OnMemberJoin',
+        'memberLeft'    => 'OnMemberLeave'
+    ];
 }
