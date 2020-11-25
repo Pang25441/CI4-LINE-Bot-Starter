@@ -2,19 +2,20 @@
 
 **Install**
   1. composer install
-  2. http://localhost/Migrate/ OR http://localhost/index.php/Migrate/
+  2. Config Database ***app/Config/Database.php***
+  3. Migration http://localhost/Migrate/ OR http://localhost/index.php/Migrate/
   
 ***
 **Config Line Channel Access**
-  * app/Config/Line.php
+  * *app/Config/Line.php*
   
 ***
-**Line Payload Event Routing**
-   * app/Config/Routes.php
+**Line Payload Event Routing info.**
+   * *app/Config/Routes.php*
    
 ***
 **Event Target Controllers**
-   * app/Controllers/LINE/*
+   * *app/Controllers/LINE/**
    
 ***
 **Rich Menu Management**
