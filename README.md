@@ -14,5 +14,6 @@
    
 ***
 **Rich Menu Management**
+   * http://localhost/Manage/Richmenu
    * http://localhost/index.php/Manage/Richmenu
   
