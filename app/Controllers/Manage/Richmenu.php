@@ -75,7 +75,7 @@ class Richmenu extends BaseController
             {
                 unlink(WRITEPATH. 'uploads/' . $newName);
             }
-            $this->response->redirect('/Manage/Richmenu');
+            $this->response->redirect(site_url('Manage/Richmenu'));
             return;
         }
 
@@ -107,7 +107,7 @@ class Richmenu extends BaseController
         {
             unlink(WRITEPATH. 'uploads/' . $newName);
         }
-        $this->response->redirect('/Manage/Richmenu');
+        $this->response->redirect(site_url('Manage/Richmenu'));
     }
 
     public function deleteRichmenu() 
